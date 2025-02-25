@@ -230,6 +230,7 @@ func (r *ServerBootConfigurationPXEReconciler) getLayerDigestsFromNestedManifest
 		return "", "", "", fmt.Errorf("failed to unmarshal index manifest: %w", err)
 	}
 
+	fmt.Printf("before: manifest: %v\n", manifest)
 	if desc.MediaType == ocispec.MediaTypeImageIndex {
 		var indexManifest ocispec.Index
 		if err := json.Unmarshal(manifestData, &indexManifest); err != nil {
@@ -259,7 +260,7 @@ func (r *ServerBootConfigurationPXEReconciler) getLayerDigestsFromNestedManifest
 		}
 		manifest = nestedManifest
 	}
-
+	fmt.Printf("after: manifest: %v\n", manifest)
 	var kernelDigest, initrdDigest, squashFSDigest string
 	for _, layer := range manifest.Layers {
 		if layer.Annotations[AnnotationArchitecture] == r.Architecture {
@@ -274,6 +275,7 @@ func (r *ServerBootConfigurationPXEReconciler) getLayerDigestsFromNestedManifest
 		}
 	}
 
+	fmt.Printf("kernelDigest: %s, initrdDigest: %s, squashFSDigest: %s\n", kernelDigest, initrdDigest, squashFSDigest)
 	if kernelDigest == "" || initrdDigest == "" || squashFSDigest == "" {
 		return "", "", "", fmt.Errorf("failed to find all required layer digests")
 	}
